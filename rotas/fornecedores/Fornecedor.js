@@ -1,4 +1,6 @@
 import TabelaFornecedor from "./TabelaFornecedor.js"
+import CampoInvalido from "../../erros/CampoInvalido.js";
+import DadosNaoFornecidos from "../../erros/DadosNaoFornecidos.js";
 
 export default class Fornecedor {
     constructor({id, empresa, email, categoria, dataCriacao, dataAtualizacao, versao}){
@@ -38,7 +40,7 @@ export default class Fornecedor {
         });
 
         if(Object.keys(dadosParaAtualizar).length === 0)
-            throw new Error("Sem dados para atualizar");
+            throw new DadosNaoFornecidos();
 
         await TabelaFornecedor.atualizar(this.id, dadosParaAtualizar);
     }
@@ -53,7 +55,7 @@ export default class Fornecedor {
         campos.forEach(campo => {
             const valor = this[campo];
             if (typeof valor !== 'string' || valor.length == 0)
-                throw new Error(`O campos '${campo}' está inválido`);
+                throw new CampoInvalido(campo);
         });
     }
 }

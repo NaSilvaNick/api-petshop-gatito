@@ -1,4 +1,5 @@
 import ModeloTabelaFornecedor from "./ModeloTabelaFornecedor.js";
+import NaoEncontrado from "../../erros/NaoEncontrado.js";
 
 export default {
     listar() {
@@ -10,7 +11,7 @@ export default {
     async pegarPorId(id) {
         const encontrado = await ModeloTabelaFornecedor.findOne({ where: { id: id }});
 
-        if(!encontrado) throw new Error("Fornecedor não encontrado");
+        if(!encontrado) throw new NaoEncontrado();
 
         return encontrado;
     },
