@@ -6,6 +6,7 @@ export default class Fornecedor {
     }
 
     async criar () {
+        this.validar();
         const resultado = await TabelaFornecedor.inserir({
             empresa: this.empresa,
             email: this.email,
@@ -19,6 +20,7 @@ export default class Fornecedor {
     }
 
     async carregar () {
+
         const encontrado = await TabelaFornecedor.pegarPorId(this.id)
         const {empresa, email, categoria, dataCriacao, dataAtualizacao, versao} = encontrado;
         Object.assign(this, {empresa, email, categoria, dataCriacao, dataAtualizacao, versao});
@@ -35,10 +37,23 @@ export default class Fornecedor {
                 dadosParaAtualizar[campo] = valor;
         });
 
-        if(Object.keys(dadosParaAtualizar).length === 0) {
+        if(Object.keys(dadosParaAtualizar).length === 0)
             throw new Error("Sem dados para atualizar");
-        }
 
         await TabelaFornecedor.atualizar(this.id, dadosParaAtualizar);
+    }
+
+    async remover () {
+        return TabelaFornecedor.remover(this.id);
+    }
+
+    validar () {
+        const campos = ['empresa','email','categoria'];
+
+        campos.forEach(campo => {
+            const valor = this[campo];
+            if (typeof valor !== 'string' || valor.length == 0)
+                throw new Error(`O campos '${campo}' está inválido`);
+        });
     }
 }

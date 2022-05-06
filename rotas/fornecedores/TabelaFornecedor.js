@@ -19,5 +19,9 @@ export default {
         return ModeloTabelaFornecedor.update(
             dadosParaAtualizar, { where: { id: id }}
         )
+    },
+
+    remover (id) {
+        return ModeloTabelaFornecedor.destroy({ where: { id: id }});
     }
 }
