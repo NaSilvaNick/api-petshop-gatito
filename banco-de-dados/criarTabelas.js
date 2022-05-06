@@ -2,4 +2,4 @@ import ModeloTabelaFornecedor from "../rotas/fornecedores/ModeloTabelaFornecedor
 
 ModeloTabelaFornecedor
     .sync()
-    .then(() => console.log("\nTabela criada com sucesso!")) 
+    .then(() => console.log("\nTabela criada com sucesso!"))
