@@ -1,17 +1,42 @@
 import ValorNaoSuportado from "./erros/ValorNaoSuportado.js";
+import jsontoxml from "jsontoxml";
 
 export class Serializador {
     json (dado) {
         return JSON.stringify(dado);
     }
 
-    serializar (dados) {
-        if (this.contentType === "application/json")
-            return this.json(
-                this.filtrar(dados)
-            );
+    xml (dados) {
+        let tag = this.tagSingular;
 
-        throw new ValorNaoSuportado(this.contentType);
+        if(Array.isArray(dados)){
+            tag = this.tagPlural;
+            dados = dados.map(dado => {
+                return {
+                    [this.tagSingular]: dado
+                }
+            });
+        }
+        
+        return jsontoxml({[tag]: dados})
+    }
+
+    serializar (dados) {
+        const dado = this.filtrar(dados)
+
+        if (this.contentType === "application/json")
+            return this.json(dado);
+
+        switch(this.contentType){
+            case "application/json":
+                return this.json(dado);
+                break;
+            case "application/xml":
+                return this.xml(dado);
+                break;
+            default:
+                throw new ValorNaoSuportado(this.contentType);
+        }
     }
 
     filtrarObjetos(dados){
@@ -36,11 +61,23 @@ export class Serializador {
 }
 
 export class SerializadorFornecedor extends Serializador {
-    constructor(contentType){
+    constructor(contentType,camposExtras){
         super();
         this.contentType = contentType;
-        this.camposPublicos = ['id','empresa','categoria'];
+        this.camposPublicos = ['id','empresa','categoria'].concat(camposExtras || []);
+        this.tagSingular = "fornecedor";
+        this.tagPlural = "fornecedores";
     }
 }
 
-export const formatosAceitos = ['application/json'];
+export class SerializadorError extends Serializador {
+    constructor(contentType,camposExtras){
+        super();
+        this.contentType = contentType;
+        this.camposPublicos = ['id','message',''].concat(camposExtras || []);
+        this.tagSingular = "error";
+        this.tagPlural = "errors";
+    }
+}
+
+export const formatosAceitos = ['application/json','application/xml'];
