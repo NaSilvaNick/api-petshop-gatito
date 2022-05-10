@@ -3,7 +3,7 @@ import NaoEncontrado from "../../erros/NaoEncontrado.js";
 
 export default {
     listar() {
-        return ModeloTabelaFornecedor.findAll();
+        return ModeloTabelaFornecedor.findAll({ raw: true});
     },
     inserir(fornecedor) {
         return ModeloTabelaFornecedor.create(fornecedor);

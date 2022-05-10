@@ -6,10 +6,25 @@ import NaoEncontrado from "./erros/NaoEncontrado.js";
 import CampoInvalido from "./erros/CampoInvalido.js";
 import DadosNaoFornecidos from "./erros/DadosNaoFornecidos.js";
 import ValorNaoSuportado from "./erros/ValorNaoSuportado.js";
+import { formatosAceitos } from "./Serializador.js";
 
 const app = express();
 
-app.use(bodyParser.json())
+app.use(bodyParser.json());
+
+app.use((requisicao,resposta,proximo) => {
+    let formatoRequisitado = requisicao.header('Accept');
+
+    if(formatoRequisitado === "*/*") { formatoRequisitado = "application/json"; }
+
+    if (formatosAceitos.indexOf(formatoRequisitado) === -1){
+        resposta.status(406).end();
+        return;
+    }
+
+    resposta.setHeader('Content-Type', formatoRequisitado);
+    proximo();
+});
 
 app.use("/api/fornecedores", roteador);
 

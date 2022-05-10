@@ -1,20 +1,27 @@
 import express from "express";
 import TabelaFornecedor from "./TabelaFornecedor.js";
 import Fornecedor from "./Fornecedor.js";
+import { SerializadorFornecedor } from "../../Serializador.js";
 
 const roteador = express.Router();
 
 roteador.get("/", async (requisicao,resposta) => {
     const resultados = await TabelaFornecedor.listar()
-    resposta.status(200).send(JSON.stringify(resultados));
+    const serializador = new SerializadorFornecedor(resposta.getHeader('Content-Type'));
+    resposta.status(200).send(
+        serializador.serializar(resultados)
+    );
 });
 
 roteador.post("/", async (requisicao,resposta,proximo) => {
     try {
         const dadosRecebidos = requisicao.body;
+        const serializador = new SerializadorFornecedor(resposta.getHeader('Content-Type'));
         const fornecedor = new Fornecedor(dadosRecebidos);
         await fornecedor.criar();
-        resposta.status(201).send(JSON.stringify(fornecedor));    
+        resposta.status(201).send(
+            serializador.serializar(fornecedor)
+        );    
     } catch (error) {
         proximo(error);
     }
@@ -23,9 +30,12 @@ roteador.post("/", async (requisicao,resposta,proximo) => {
 roteador.get("/:idFornecedor", async (requisicao,resposta,proximo) => {
     try {
         const id = requisicao.params.idFornecedor;
+        const serializador = new SerializadorFornecedor(resposta.getHeader('Content-Type'));
         const fornecedor = new Fornecedor({id:id});
         await fornecedor.carregar();
-        resposta.status(200).send(JSON.stringify(fornecedor));
+        resposta.status(200).send(
+            serializador.serializar(fornecedor)
+        );
     } catch (error) {
         proximo(error);
     }
