@@ -2,6 +2,7 @@ import express from "express";
 import TabelaFornecedor from "./TabelaFornecedor.js";
 import Fornecedor from "./Fornecedor.js";
 import { SerializadorFornecedor } from "../../Serializador.js";
+import roteadorProdutos from "./produtos/index.js";
 
 const roteador = express.Router();
 
@@ -68,5 +69,7 @@ roteador.delete("/:idFornecedor", async (requisicao,resposta,proximo) => {
         proximo(error);
     }
 });
+
+roteador.use("/:idFornecedor/produtos",roteadorProdutos)
 
 export default roteador;
