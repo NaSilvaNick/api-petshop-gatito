@@ -3,8 +3,8 @@ import CampoInvalido from "../../erros/CampoInvalido.js";
 import DadosNaoFornecidos from "../../erros/DadosNaoFornecidos.js";
 
 export default class Fornecedor {
-    constructor({id, empresa, email, categoria, dataCriacao, dataAtualizacao, versao}){
-        Object.assign(this, {id, empresa, email, categoria, dataCriacao, dataAtualizacao, versao})
+    constructor({id, empresa, email, categoria, data_criacao, data_atualizacao, versao}){
+        Object.assign(this, {id, empresa, email, categoria, data_criacao, data_atualizacao, versao})
     }
 
     async criar () {
@@ -16,16 +16,16 @@ export default class Fornecedor {
         });
 
         this.id = resultado.id;
-        this.dataCriacao = resultado.dataCriacao;
-        this.dataAtualizacao = resultado.dataAtualizacao;
+        this.data_criacao = resultado.data_criacao;
+        this.data_atualizacao = resultado.data_atualizacao;
         this.versao = resultado.versao;
     }
 
     async carregar () {
 
         const encontrado = await TabelaFornecedor.pegarPorId(this.id)
-        const {empresa, email, categoria, dataCriacao, dataAtualizacao, versao} = encontrado;
-        Object.assign(this, {empresa, email, categoria, dataCriacao, dataAtualizacao, versao});
+        const {empresa, email, categoria, data_criacao, data_atualizacao, versao} = encontrado;
+        Object.assign(this, {empresa, email, categoria, data_criacao, data_atualizacao, versao});
     }
 
     async atualizar () {

@@ -1,11 +1,22 @@
-import ModeloTabelaProduto from "./ModeloTabelaProduto.js";
+import Modelo from "./ModeloTabelaProduto.js";
 
 export default {
     listar (idFornecedor){
-        return ModeloTabelaProduto.findAll({
+        return Modelo.findAll({
             where: {
                 fornecedor: idFornecedor
             }
         });
+    },
+    inserir(dados){
+        return Modelo.create(dados);
+    },
+    remover (idProduto, idFornecedor) {
+        return Modelo.destroy({
+            where: {
+                id: idProduto,
+                fornecedor: idFornecedor
+            }
+        })
     }
 }
