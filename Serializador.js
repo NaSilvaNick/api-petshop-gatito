@@ -74,9 +74,19 @@ export class SerializadorError extends Serializador {
     constructor(contentType,camposExtras){
         super();
         this.contentType = contentType;
-        this.camposPublicos = ['id','message',''].concat(camposExtras || []);
+        this.camposPublicos = ['id','message'].concat(camposExtras || []);
         this.tagSingular = "error";
         this.tagPlural = "errors";
+    }
+}
+
+export class SerializadorProduto extends Serializador {
+    constructor(contentType,camposExtras){
+        super();
+        this.contentType = contentType;
+        this.camposPublicos = ['id','titulo'].concat(camposExtras || []);
+        this.tagSingular = "produto";
+        this.tagPlural = "produtos";
     }
 }
 

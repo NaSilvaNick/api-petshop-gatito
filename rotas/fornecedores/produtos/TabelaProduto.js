@@ -1,11 +1,13 @@
 import Modelo from "./ModeloTabelaProduto.js";
+import instancia from "../../../banco-de-dados/index.js";
 
 export default {
     listar (idFornecedor){
         return Modelo.findAll({
             where: {
                 fornecedor: idFornecedor
-            }
+            },
+            raw: true
         });
     },
     inserir(dados){
@@ -18,5 +20,44 @@ export default {
                 fornecedor: idFornecedor
             }
         })
+    },
+    async pegarPorId(id, idFornecedor) {
+        const encontrado = await Modelo.findOne({
+            where: {
+                id: id,
+                fornecedor: idFornecedor
+            },
+            raw: true
+        });
+
+        if(!encontrado) {
+            throw new Error("Produto não foi encontrado!");
+        }
+
+        return encontrado;
+    },
+    atualizar(dadosDoProduto,dadosParaAtualizar){
+        return Modelo.update(
+            dadosParaAtualizar,
+            {
+                where: dadosDoProduto
+            }
+        );
+    },
+    subtrair(idProduto, idFornecedor, campo, quantidade){
+        return instancia.transaction(async transacao => {
+            const produto = await Modelo.findOne({
+                where: {
+                    id: idProduto,
+                    fornecedor: idFornecedor
+                }
+            });
+
+            produto[campo] = quantidade;
+
+            await produto.save();
+
+            return produto;
+        });
     }
 }

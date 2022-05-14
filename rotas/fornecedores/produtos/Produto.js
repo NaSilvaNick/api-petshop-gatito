@@ -5,6 +5,16 @@ export default class Produto {
     constructor({id, titulo, preco, estoque, fornecedor, data_criacao, data_atualizacao, versao}){
         Object.assign(this, {id, titulo, preco, estoque, fornecedor, data_criacao, data_atualizacao, versao})
     }
+    
+    validar () {
+        if(typeof this.titulo !== 'string' || this.titulo.length === 0) {
+            throw new Error("O campo titulo está inválido");
+        }
+
+        if(typeof this.preco !== 'number' || this.preco == 0){
+            throw new Error("O campo preco está inválido");
+        }
+    }
 
     async criar() {
         this.validar()
@@ -25,13 +35,37 @@ export default class Produto {
         return TabelaProduto.remover(this.id,this.fornecedor)
     }
 
-    validar () {
-        if(typeof this.titulo !== 'string' || this.titulo.length === 0) {
-            throw new Error("O campo titulo está inválido");
-        }
+    async carregar () {
+        const produto = await TabelaProduto.pegarPorId(this.id, this.fornecedor)
+        const {titulo, preco, estoque, fornecedor, data_criacao, data_atualizacao, versao} = produto;
+        Object.assign(this, {titulo, preco, estoque, fornecedor, data_criacao, data_atualizacao, versao});
+    }
 
-        if(typeof this.preco !== 'number' || this.preco == 0){
-            throw new Error("O campo preco está inválido");
-        }
+    atualizar () {
+        const dadosParaAtualizar = {}
+
+        if (typeof this.titulo === 'string' && this.titulo.length > 0)
+            dadosParaAtualizar.titulo = this.titulo;
+
+        if(typeof this.preco === 'number' && this.preco > 0)
+            dadosParaAtualizar.preco = this.preco;
+    
+        if(typeof this.estoque === 'number')
+            dadosParaAtualizar.estoque = this.estoque;
+
+        if(Object.keys(dadosParaAtualizar).length === 0)
+            throw new Error('Não foram fornecidos dados para atualizar')
+        
+        return TabelaProduto.atualizar(
+            {
+                id: this.id,
+                fornecedor: this.fornecedor
+            },
+            dadosParaAtualizar
+        );
+    }
+
+    diminuirEstoque(){
+        return TabelaProduto.subtrair(this.id,this.fornecedor,'estoque',this.estoque);
     }
 }

@@ -22,9 +22,8 @@ export default class Fornecedor {
     }
 
     async carregar () {
-
-        const encontrado = await TabelaFornecedor.pegarPorId(this.id)
-        const {empresa, email, categoria, data_criacao, data_atualizacao, versao} = encontrado;
+        const fornecedor = await TabelaFornecedor.pegarPorId(this.id)
+        const {empresa, email, categoria, data_criacao, data_atualizacao, versao} = fornecedor;
         Object.assign(this, {empresa, email, categoria, data_criacao, data_atualizacao, versao});
     }
 
