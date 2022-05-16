@@ -5,6 +5,30 @@ import { SerializadorProduto } from "../../../Serializador.js";
 
 const roteador = express.Router({ mergeParams: true});
 
+roteador.options("/", (requisicao,resposta) => {
+    resposta
+        .set("Access-Control-Allow-Methods", "GET, POST")
+        .set("Access-Control-Allow-Headers", "Content-Type")
+        .status(200)
+        .end();
+});
+
+roteador.options("/:id", (requisicao,resposta) => {
+    resposta
+        .set("Access-Control-Allow-Methods", "GET, PUT, DELETE, HEAD")
+        .set("Access-Control-Allow-Headers", "Content-Type")
+        .status(200)
+        .end();
+});
+
+roteador.options("/:id/diminuir-estoque", (requisicao,resposta) => {
+    resposta
+        .set("Access-Control-Allow-Methods", "POST")
+        .set("Access-Control-Allow-Headers", "Content-Type")
+        .status(200)
+        .end();
+});
+
 roteador.get('/', async (requisicao,resposta) => {
     const produtos = await TabelaProduto.listar(requisicao.fornecedor.id);
     const serializador = new SerializadorProduto(resposta.getHeader("Content-Type"));

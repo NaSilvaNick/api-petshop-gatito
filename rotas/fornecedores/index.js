@@ -6,9 +6,26 @@ import roteadorProdutos from "./produtos/index.js";
 
 const roteador = express.Router();
 
+roteador.options("/", (requisicao,resposta) => {
+    resposta
+        .set("Access-Control-Allow-Methods", "GET, POST")
+        .set("Access-Control-Allow-Headers", "Content-Type")
+        .status(200)
+        .end();
+});
+
+roteador.options("/:idFornecedor", (requisicao,resposta) => {
+    resposta
+        .set("Access-Control-Allow-Methods", "GET, PUT, DELETE")
+        .set("Access-Control-Allow-Headers", "Content-Type")
+        .status(200)
+        .end();
+});
+
 roteador.get("/", async (requisicao,resposta) => {
     const resultados = await TabelaFornecedor.listar()
-    const serializador = new SerializadorFornecedor(resposta.getHeader('Content-Type'));
+    const serializador = new SerializadorFornecedor(
+        resposta.getHeader('Content-Type'), ['empresa']);
     resposta.status(200).send(
         serializador.serializar(resultados)
     );
@@ -19,7 +36,7 @@ roteador.get("/:idFornecedor", async (requisicao,resposta,proximo) => {
         const id = requisicao.params.idFornecedor;
         const serializador = new SerializadorFornecedor(
             resposta.getHeader('Content-Type'),
-            ['email', 'data_criacao', 'data_atualizacao', 'versao']
+            ['email', 'empresa', 'data_criacao', 'data_atualizacao', 'versao']
         );
         const fornecedor = new Fornecedor({id:id});
         await fornecedor.carregar();
@@ -34,7 +51,8 @@ roteador.get("/:idFornecedor", async (requisicao,resposta,proximo) => {
 roteador.post("/", async (requisicao,resposta,proximo) => {
     try {
         const dadosRecebidos = requisicao.body;
-        const serializador = new SerializadorFornecedor(resposta.getHeader('Content-Type'));
+        const serializador = new SerializadorFornecedor(
+            resposta.getHeader('Content-Type'), ['empresa']);
         const fornecedor = new Fornecedor(dadosRecebidos);
         await fornecedor.criar();
         resposta.status(201).send(

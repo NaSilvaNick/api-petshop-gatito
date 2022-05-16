@@ -7,6 +7,7 @@ import CampoInvalido from "./erros/CampoInvalido.js";
 import DadosNaoFornecidos from "./erros/DadosNaoFornecidos.js";
 import ValorNaoSuportado from "./erros/ValorNaoSuportado.js";
 import { formatosAceitos, SerializadorError } from "./Serializador.js";
+import roteador2 from "./rotas/fornecedores/index.v2.js";
 
 const app = express();
 
@@ -26,7 +27,13 @@ app.use((requisicao,resposta,proximo) => {
     proximo();
 });
 
+app.use((requisicao,resposta,proximo) => {
+    resposta.set("Access-Control-Allow-Origin", "*");
+    proximo();
+});
+
 app.use("/api/fornecedores", roteador);
+app.use("/api/v2/fornecedores", roteador2);
 
 app.use((error, requisicao, resposta, proximo) => {
     const serializador = new SerializadorError(resposta.getHeader("Content-Type"))
