@@ -1,5 +1,6 @@
 import Modelo from "./ModeloTabelaProduto.js";
 import instancia from "../../../banco-de-dados/index.js";
+import NaoEncontrado from "../../../erros/NaoEncontrado.js";
 
 export default {
     listar (idFornecedor){
@@ -31,7 +32,7 @@ export default {
         });
 
         if(!encontrado) {
-            throw new Error("Produto não foi encontrado!");
+            throw new NaoEncontrado("Produto");
         }
 
         return encontrado;

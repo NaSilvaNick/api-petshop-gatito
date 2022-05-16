@@ -11,6 +11,29 @@ roteador.get('/', async (requisicao,resposta) => {
     resposta.status(200).send(serializador.serializar(produtos));
 });
 
+roteador.head('/:id', async (requisicao,resposta,proximo) => {
+    try {
+        const dados = {
+            id: requisicao.params.id,
+            fornecedor: requisicao.fornecedor.id
+        }
+        const produto = new Produto(dados);
+        await produto.carregar()
+        
+        const timestamp = new Date(produto.data_atualizacao).getTime();
+
+        resposta
+            .set("x-powered-by", "Nickolas, o cara")
+            .set("ETag", produto.versao)
+            .set("Last-Modified", timestamp)
+            .status(200)
+            .end();
+
+    } catch (error) {
+        proximo(error);
+    }
+});
+
 roteador.get('/:id', async (requisicao,resposta,proximo) => {
     try {
         const dados = {
@@ -24,7 +47,14 @@ roteador.get('/:id', async (requisicao,resposta,proximo) => {
             ['preco','estoque','fornecedor','data_criacao','data_atualizacao','versao']
         );
         
-        resposta.status(200).send(serializador.serializar(produto));
+        const timestamp = new Date(produto.data_atualizacao).getTime();
+
+        resposta
+            .set("ETag", produto.versao)
+            .set("Last-Modified", timestamp)
+            .status(200)
+            .send(serializador.serializar(produto));
+
     } catch (error) {
         proximo(error);
     }
@@ -38,7 +68,16 @@ roteador.post('/', async (requisicao,resposta,proximo) => {
         const produto = new Produto(dados);
         await produto.criar();
         const serializador = new SerializadorProduto(resposta.getHeader("Content-Type"));
-        resposta.status(201).send(serializador.serializar(produto));
+
+        const timestamp = new Date(produto.data_atualizacao).getTime();
+
+        resposta
+            .set("ETag", produto.versao)
+            .set("Last-Modified", timestamp)
+            .set("Location", `/api/fornecedores/${produto.fornecedor}/produtos/${produto.id}`)
+            .status(201)
+            .send(serializador.serializar(produto));
+
     } catch(error) {
         proximo(error);
     }
@@ -56,7 +95,16 @@ roteador.put("/:id", async (requisicao,resposta,proximo) => {
         );
         const produto = new Produto(dados);
         await produto.atualizar();
-        resposta.status(204).end();
+        await produto.carregar();
+
+        const timestamp = new Date(produto.data_atualizacao).getTime();
+
+        resposta
+            .set("ETag", produto.versao)
+            .set("Last-Modified", timestamp)
+            .status(204)
+            .end();
+
     } catch (error) {
         proximo(error);
     }
@@ -82,7 +130,15 @@ roteador.post("/:id/diminuir-estoque", async (requisicao,resposta,proximo) => {
         await produto.carregar();
         produto.estoque = produto.estoque - requisicao.body.quantidade
         await produto.diminuirEstoque();
-        resposta.status(204).end();
+        await produto.carregar();
+
+        const timestamp = new Date(produto.data_atualizacao).getTime();
+
+        resposta
+            .set("ETag", produto.versao)
+            .set("Last-Modified", timestamp)
+            .status(204)
+            .end();
     } catch (error) {
         proximo(error);
     }
