@@ -1,0 +1,12 @@
+{
+    "mysql": {
+        "database": "petshop-gatito",
+        "user": "root",
+        "password": "root",
+        "host": "127.0.0.1:3600",
+        "dialect": "mysql"
+    },
+    "api": {
+        "port": 3000
+    }
+}
