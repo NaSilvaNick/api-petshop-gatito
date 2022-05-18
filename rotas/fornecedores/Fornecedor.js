@@ -53,5 +53,7 @@ export default class Fornecedor {
       const valor = this[campo]
       if (typeof valor !== 'string' || valor.length === 0) { throw new CampoInvalido(campo) }
     })
+
+    return true;
   }
 }
