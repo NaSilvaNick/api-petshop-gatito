@@ -1,59 +1,59 @@
-import express from "express";
-import bodyParser from "body-parser";
-import config from "config";
-import roteador from "./rotas/fornecedores/index.js";
-import NaoEncontrado from "./erros/NaoEncontrado.js";
-import CampoInvalido from "./erros/CampoInvalido.js";
-import DadosNaoFornecidos from "./erros/DadosNaoFornecidos.js";
-import ValorNaoSuportado from "./erros/ValorNaoSuportado.js";
-import { formatosAceitos, SerializadorError } from "./Serializador.js";
-import roteador2 from "./rotas/fornecedores/index.v2.js";
+import express from 'express'
+import bodyParser from 'body-parser'
+import config from 'config'
+import roteador from './rotas/fornecedores/index.js'
+import NaoEncontrado from './erros/NaoEncontrado.js'
+import CampoInvalido from './erros/CampoInvalido.js'
+import DadosNaoFornecidos from './erros/DadosNaoFornecidos.js'
+import ValorNaoSuportado from './erros/ValorNaoSuportado.js'
+import { formatosAceitos, SerializadorError } from './Serializador.js'
+import roteador2 from './rotas/fornecedores/index.v2.js'
 
-const app = express();
+const app = express()
 
-app.use(bodyParser.json());
+app.use(bodyParser.json())
 
-app.use((requisicao,resposta,proximo) => {
-    let formatoRequisitado = requisicao.header('Accept');
+app.use((requisicao, resposta, proximo) => {
+  let formatoRequisitado = requisicao.header('Accept')
 
-    if(formatoRequisitado === "*/*") { formatoRequisitado = "application/json"; }
+  if (formatoRequisitado === '*/*') { formatoRequisitado = 'application/json' }
 
-    if (formatosAceitos.indexOf(formatoRequisitado) === -1){
-        resposta.status(406).end();
-        return;
-    }
+  if (formatosAceitos.indexOf(formatoRequisitado) === -1) {
+    resposta.status(406).end()
+    return
+  }
 
-    resposta.setHeader('Content-Type', formatoRequisitado);
-    proximo();
-});
+  resposta.setHeader('Content-Type', formatoRequisitado)
+  proximo()
+})
 
-app.use((requisicao,resposta,proximo) => {
-    resposta.set("Access-Control-Allow-Origin", "*");
-    proximo();
-});
+app.use((requisicao, resposta, proximo) => {
+  resposta.set('Access-Control-Allow-Origin', '*')
+  proximo()
+})
 
-app.use("/api/fornecedores", roteador);
-app.use("/api/v2/fornecedores", roteador2);
+app.use('/api/fornecedores', roteador)
+app.use('/api/v2/fornecedores', roteador2)
 
 app.use((error, requisicao, resposta, proximo) => {
-    const serializador = new SerializadorError(resposta.getHeader("Content-Type"))
-    let status = 500;
-    
-    if (error instanceof NaoEncontrado) status = 404;
-    if (error instanceof CampoInvalido || error instanceof DadosNaoFornecidos) status = 400;
-    if (error instanceof ValorNaoSuportado) status = 406;
+  const serializador = new SerializadorError(resposta.getHeader('Content-Type'))
+  let status = 500
 
-    resposta.status(status).send(
-        serializador.serializar({
-            message: error.message,
-            id: error.idErro
-        })
-    );
-});
+  if (error instanceof NaoEncontrado) status = 404
+  if (error instanceof CampoInvalido || error instanceof DadosNaoFornecidos) status = 400
+  if (error instanceof ValorNaoSuportado) status = 406
+
+  resposta.status(status).send(
+    serializador.serializar({
+      message: error.message,
+      id: error.idErro
+    })
+  )
+})
 
 app.listen(
-    config.get("api.port"),
-    () => console.log(`A API está funcionando na porta ${config.get("api.port")}`)
+  config.get('api.port'),
+  () => console.log(`A API está funcionando na porta ${config.get('api.port')}`)
 )
 
-export default app;
+export default app
